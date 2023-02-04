@@ -3,6 +3,7 @@
 
 namespace App\MessageHandler;
 
+use Mpdf\Mpdf;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Message\PurchaseConfirmationNotification;
@@ -21,7 +22,14 @@ class PurchaseConfirmationNotificationHandler
     public function __invoke(PurchaseConfirmationNotification $notification)
     {
         //  Create a PDF contract note
-        echo 'Creating a PDF contract note...<br>';
+      
+        $mpdf = new Mpdf();
+        $content = "<h1>Contract Note For Order{$notification->getOrder()->getId()}</h1>";
+        $content .= "<p>Total: <b>$1898.75</b></p>";
+
+        $mpdf->WriteHTML($content);
+        $contractNotePdf = $mpdf->output('', 'S');
+
         //  Email the contract note to the buyer
     
         $email = (new Email())
@@ -29,7 +37,8 @@ class PurchaseConfirmationNotificationHandler
             ->to($notification->getOrder()->getBuyer()->getEmail())
             ->subject('Contract note for order ' . $notification->getorder()->getId())
             ->text('Here is your contract note')
-            ->html('<p>Here is your contract note</p>');
+            ->html('<p>Here is your contract note</p>')
+            ->attach($contractNotePdf, 'contract-note.pdf');
         
 
         $this->mailer->send($email);
