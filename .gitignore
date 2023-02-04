@@ -96,3 +96,7 @@
 notes.txt
 
 docker-compose.override.yml
+
+composer.lock
+
+mysql
