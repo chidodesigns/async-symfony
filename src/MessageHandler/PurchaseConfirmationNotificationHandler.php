@@ -3,6 +3,8 @@
 
 namespace App\MessageHandler;
 
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\MailerInterface;
 use App\Message\PurchaseConfirmationNotification;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -11,12 +13,26 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class PurchaseConfirmationNotificationHandler
 {
 
+    public function __construct(private MailerInterface $mailer)
+    {
+
+    }
+
     public function __invoke(PurchaseConfirmationNotification $notification)
     {
         //  Create a PDF contract note
         echo 'Creating a PDF contract note...<br>';
         //  Email the contract note to the buyer
-        echo 'Emailing contract note to ' .  $notification->getOrder()->getBuyer()->getEmail() . '<br>';
+    
+        $email = (new Email())
+            ->from('sales@stockapp.com')
+            ->to($notification->getOrder()->getBuyer()->getEmail())
+            ->subject('Contract note for order ' . $notification->getorder()->getId())
+            ->text('Here is your contract note')
+            ->html('<p>Here is your contract note</p>');
+        
+
+        $this->mailer->send($email);
     }
 
 }

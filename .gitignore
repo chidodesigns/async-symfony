@@ -94,3 +94,5 @@
 .idea
 
 notes.txt
+
+docker-compose.override.yml

@@ -19,6 +19,11 @@ class StockTransactionController extends AbstractController
         //  We are creating an annonymous class
         $order = new class {
 
+            public function getId()
+            {
+                return 1;
+            }
+
             public function getBuyer():object
             {
                 return new class {
