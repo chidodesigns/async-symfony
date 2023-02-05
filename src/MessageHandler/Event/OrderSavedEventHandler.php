@@ -1,17 +1,14 @@
 <?php
+namespace App\MessageHandler\Event;
 
-
-namespace App\MessageHandler;
-
+use App\Message\Event\OrderSavedEvent;
 use Mpdf\Mpdf;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\MailerInterface;
-use App\Message\PurchaseConfirmationNotification;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Mime\Email;
 
-//  PHP Attributes: Small meta data elements added for PHP classes, functions, closures, class properties, class methods, constants, and even on anoymous classes. In PHP 8
 #[AsMessageHandler]
-class PurchaseConfirmationNotificationHandler
+class OrderSavedEventHandler
 {
 
     public function __construct(private MailerInterface $mailer)
@@ -19,12 +16,12 @@ class PurchaseConfirmationNotificationHandler
 
     }
 
-    public function __invoke(PurchaseConfirmationNotification $notification)
+    public function __invoke(OrderSavedEvent $event)
     {
         //  Create a PDF contract note
       
         $mpdf = new Mpdf();
-        $content = "<h1>Contract Note For Order{$notification->getOrderId()}</h1>";
+        $content = "<h1>Contract Note For Order{$event->getOrderId()}</h1>";
         $content .= "<p>Total: <b>$1898.75</b></p>";
 
         $mpdf->WriteHTML($content);
@@ -35,7 +32,7 @@ class PurchaseConfirmationNotificationHandler
         $email = (new Email())
             ->from('sales@stockapp.com')
             ->to('email@example.tech')
-            ->subject('Contract note for order ' . $notification->getOrderId())
+            ->subject('Contract note for order ' . $event->getOrderId())
             ->text('Here is your contract note')
             ->html('<p>Here is your contract note</p>')
             ->attach($contractNotePdf, 'contract-note.pdf');

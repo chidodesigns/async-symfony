@@ -3,10 +3,18 @@
 namespace App\MessageHandler\Command;
 
 use App\Message\Command\SaveOrder;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use App\Message\Event\OrderSavedEvent;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
 
-class SaveOrderHandler implements MessageHandlerInterface
+#[AsMessageHandler()]
+class SaveOrderHandler 
 {
+
+    public function __construct(private MessageBusInterface $eventBus)
+    {
+        
+    }
 
     public function __invoke(SaveOrder $saveOrder)
     {
@@ -16,7 +24,7 @@ class SaveOrderHandler implements MessageHandlerInterface
         echo 'Order Being Saved' . PHP_EOL;
 
         //  Dispatch an event message on an event bus
-
+        $this->eventBus->dispatch(new OrderSavedEvent($orderId));
         
     }
     
